@@ -36,7 +36,6 @@ class Model():
 			next_layer = BatchNorm(ip, self.isTrain, self.decay)
 			next_layer = Relu(next_layer)
 			next_layer = Conv(next_layer, filter = 3, stride = 1, output_ch = self.growth_rate)
-			#next_layer = tf.concat([ip, next_layer], axis = 3)
 
 			return next_layer
 
@@ -85,8 +84,6 @@ class Model():
 			self.X = tf.placeholder(name = 'Input', shape = [None, 32, 32, 3], dtype = tf.float32)
 			self.Lab = tf.placeholder(name = 'Label', shape = None, dtype = tf.int32)
 			self.isTrain = tf.placeholder(name = 'isTrain', shape = None, dtype = tf.bool)
-			self.step = tf.get_variable("Global_Step", shape = 1, dtype = tf.int32,initializer = tf.constant_initializer(0))
-			self.step_inc = tf.add(self.step, 1)
 		
 		with tf.variable_scope('Input'):
 			Input = Conv(self.X, filter = 3, stride = 1, output_ch = self.growth_rate * 2)
@@ -124,9 +121,6 @@ class Model():
 
 		print('Data Loaded')
 
-		#data_train = normalize(data_train)
-		#data_val = normalize(data_val)
-
 		data_train = (data_train - np.mean(data_train)) / np.std(data_train)
 		data_val = (data_val - np.mean(data_val)) / np.std(data_val)
 
@@ -153,6 +147,7 @@ class Model():
 
 			init_op = tf.global_variables_initializer()
 			sess.run(init_op)
+			step = 0
 			
 			if self.restore:
 				print('Restoring Checkpoint')
@@ -161,8 +156,7 @@ class Model():
 				print('Checkpoint Restored')
 
 			print('Paramters:', sess.run(parameter_count))
-			#step = self.step.eval(sess)
-			step = 0
+
 
 			for i in range(epochs):
 				correct = 0
@@ -187,8 +181,6 @@ class Model():
 
 					cw = sess.run(self.cost_sum, feed_dict={self.X: B_Data, self.Lab: B_Label, self.isTrain: True})	
 
-					#step = sess.run(self.step_inc)
-					#self.step = step
 					step = step + 1
 					self.writer.add_summary(cw, step)
 

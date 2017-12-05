@@ -115,13 +115,13 @@ def preprocess(images, label, augment, val_fraction):
 
 		return np.concatenate((t1,t2,t3,t4,t5,t6), axis = 0), lab
 
-def normalize(ip):
+def normalize(ip): #Not used, channel wise norm
 	
 	for i in range(3):
 		ip[:,:,:,i] = (ip[:,:,:,i] - np.mean(ip[:,:,:,i]))/np.std(ip[:,:,:,i])
 	return ip 
 
-def unnormalize(ip):
+def unnormalize(ip): #Not used
 	
 	return (((ip + 1)/2) * 255).astype(np.uint8) #[-1,1] -> [0,255]
 
